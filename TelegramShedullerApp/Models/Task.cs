@@ -13,8 +13,7 @@ namespace TelegramShedullerApp.Models
     {
         [BsonId]
         //[BsonRepresentation(BsonType.ObjectId)]
-        [DataMember]
-        private object Id { get; set; }
+        private Guid Id { get { return Guid.NewGuid(); } set { Id = value; } }
 
         
         [BsonElement("UserId")]
@@ -54,11 +53,5 @@ namespace TelegramShedullerApp.Models
 
             return t;
         }
-
-        /*public Task()
-        {
-            Random r = new Random();
-            this.Id = r.Next(1000000000);
-        }*/
     }
 }
