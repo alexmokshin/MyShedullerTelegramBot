@@ -14,7 +14,5 @@ namespace TelegramShedullerApp.Controllers
         {
             return "вроде работает";
         }
-
-        
     }
 }
