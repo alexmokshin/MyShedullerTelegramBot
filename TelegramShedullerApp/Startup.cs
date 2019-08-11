@@ -21,7 +21,7 @@ namespace TelegramShedullerApp
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                .AddJsonFile(@"C:\Users\moksh\RiderProjects\MyShedullerTelegramBot\TelegramShedullerApp\appsettings.json", optional: true, reloadOnChange: true);
 
             Configuration = builder.Build();
 
@@ -45,7 +45,7 @@ namespace TelegramShedullerApp
             services.AddOptions();
 
 
-            services.Configure<TelegramShedullerApp.DB.MongoSettings>(Configuration.GetSection("MongoSettings"));
+            services.Configure<DB.MongoSettings>(Configuration.GetSection("MongoSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
