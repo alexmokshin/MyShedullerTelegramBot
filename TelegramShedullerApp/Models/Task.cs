@@ -13,7 +13,7 @@ namespace TelegramShedullerApp.Models
     {
         [BsonId]
         //[BsonRepresentation(BsonType.ObjectId)]
-        private Guid Id { get { return Guid.NewGuid(); } set { Id = value; } }
+        private Guid Id { get { return Guid.NewGuid(); } }
 
         
         [BsonElement("UserId")]
@@ -31,17 +31,16 @@ namespace TelegramShedullerApp.Models
         [DataMember]
         private DateTime TaskDate { get; set; }
 
-        public Task CreateTask(long user_id, string task_text, DateTime task_date)
+        public Task CreateTask(long userId, string taskText, DateTime taskDate)
         {
-            //Random r = new Random();
-            //this.Id = r.Next(1000000000);
-            this.UserId = user_id;
-            this.TaskDate = task_date;
-            this.TaskText = task_text;
+            this.UserId = userId;
+            this.TaskDate = taskDate;
+            this.TaskText = taskText;
 
             return this;
         }
 
+        //TODO: Remove after test ends
         public bool CheckOnNull()
         {
             bool t = false;
