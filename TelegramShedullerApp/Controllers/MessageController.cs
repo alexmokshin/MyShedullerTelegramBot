@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 using TelegramShedullerApp.Models;
 using Microsoft.Extensions.Options;
+using TelegramShedullerApp.DB;
 
 namespace TelegramShedullerApp.Controllers
 {
@@ -15,7 +16,8 @@ namespace TelegramShedullerApp.Controllers
     [ApiController]
     public class MessageController : ControllerBase
     {
-        private IOptions<TelegramShedullerApp.DB.MongoSettings> _options;
+        private MongoSettings mongoSettings;
+       
 
         [HttpPost]
         [Route("CreateTask")]
@@ -30,13 +32,13 @@ namespace TelegramShedullerApp.Controllers
                 return result;
             }
 
-            TelegramShedullerApp.DB.MongoDbContext context = new DB.MongoDbContext();
+            MongoDbContext context = new DB.MongoDbContext(mongoSettings);
 
             
 
             try
             {
-                await context.InsertNewTask(newTask, _options);
+                await context.InsertNewTask(newTask);
                 result.StatusCode = 200;
                 return result;
                 
@@ -50,7 +52,7 @@ namespace TelegramShedullerApp.Controllers
 
         public MessageController(IOptions<DB.MongoSettings> settings)
         {
-            _options = settings;
+            mongoSettings = settings.Value;
         }
     }
 }

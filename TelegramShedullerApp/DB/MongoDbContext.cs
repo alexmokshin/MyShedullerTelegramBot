@@ -1,47 +1,60 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace TelegramShedullerApp.DB
 {
     public class MongoDbContext
     {
+        private static Stopwatch _stopWatch;
         private static IMongoDatabase MongoDatabase { get; set; }
 
-        private string MongoCollectionName = "todotasks";
-
-        //TODO: Add mongo db credentials
-        public MongoDbContext()
+        private static string MongoCollectionName;
+        
+        public MongoDbContext(MongoSettings settings)
         {
+            Console.WriteLine("Call constructor for {0}",this.ToString());
             if (MongoDatabase == null)
             {
-                Console.WriteLine("{0} Initialize MongoConnection",DateTime.Now);
-
-                MongoDatabase = MongoConnection.GetMongoDatabaseAsync();
+                Console.WriteLine("Try to get MongoConnection");
+                MongoCollectionName = settings.Collection;
+                var connection = new MongoConnection(settings);
+                MongoDatabase = connection.GetMongoDatabaseAsync();
             }
         }
 
-        public async Task<string> InsertNewTask(TelegramShedullerApp.Models.Task myTask, IOptions<DB.MongoSettings> options)
+        public async Task InsertNewTask(TelegramShedullerApp.Models.Task myTask)
         {
+            _stopWatch = new Stopwatch();
+            _stopWatch.Start();
             var p = myTask.ToBsonDocument();
+            Console.WriteLine("Time to boxing class {0} or {1}ticks",_stopWatch.ElapsedMilliseconds, _stopWatch.ElapsedTicks);
 
-            Console.WriteLine("{0} Try to get collection",DateTime.Now);
-
+            //Console.WriteLine("{0} Try to get collection",DateTime.Now);
+            _stopWatch.Restart();
             var collection = MongoDatabase.GetCollection<BsonDocument>(MongoCollectionName);
-            Console.WriteLine("{0} Collection return",DateTime.Now);
+            Console.WriteLine("Collection return {0}ms or {1}ticks",_stopWatch.ElapsedMilliseconds,_stopWatch.ElapsedTicks);
 
-
+            _stopWatch.Restart();
             try
-            {
+            { 
                 await collection.InsertOneAsync(p);
-                return "Success";
             }
             catch(Exception)
             {
                 throw;
             }
+            Console.WriteLine("Elapsed time to insert doc {0}",_stopWatch.ElapsedMilliseconds);
+        }
+
+        public async Task<List<Models.Task>> GetTasksForUser(long userId)
+        {
+            List<Models.Task> tasks = new List<Models.Task>();
+            return tasks;
         }
 
 
