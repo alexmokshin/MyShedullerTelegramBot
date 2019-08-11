@@ -9,6 +9,7 @@ using Telegram.Bot.Types;
 using TelegramShedullerApp.Models;
 using Microsoft.Extensions.Options;
 using TelegramShedullerApp.DB;
+using Newtonsoft.Json;
 
 namespace TelegramShedullerApp.Controllers
 {
@@ -21,16 +22,12 @@ namespace TelegramShedullerApp.Controllers
 
         [HttpPost]
         [Route("CreateTask")]
-        public async Task<OkObjectResult> CreateTask([FromBody] Models.Task newTask)
+        public async Task<OkObjectResult> CreateTask([FromBody] UserTask newUserTask)
         {
 
-            OkObjectResult result = new OkObjectResult(newTask);
+            OkObjectResult result = new OkObjectResult(newUserTask);
 
-            if (newTask.CheckOnNull())
-            {
-                result.StatusCode = 400;
-                return result;
-            }
+            
 
             MongoDbContext context = new DB.MongoDbContext(mongoSettings);
 
@@ -38,7 +35,7 @@ namespace TelegramShedullerApp.Controllers
 
             try
             {
-                await context.InsertNewTask(newTask);
+                await context.InsertNewTask(newUserTask);
                 result.StatusCode = 200;
                 return result;
                 
@@ -47,6 +44,25 @@ namespace TelegramShedullerApp.Controllers
             {
                 result.StatusCode = -500;
                 return result;
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAllTasks")]
+        public JsonResult GetAllTask(long id)
+        {
+            MongoDbContext context = new MongoDbContext(mongoSettings);
+            
+            try
+            {
+                var result = context.GetTasksForUser(id).Result;
+                return new JsonResult(result);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new JsonResult(e.Message);
             }
         }
 

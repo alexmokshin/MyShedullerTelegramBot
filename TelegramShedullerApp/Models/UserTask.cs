@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace TelegramShedullerApp.Models
 {
     [DataContract]
-    public class Task
+    public class UserTask
     {
         [BsonId]
         //[BsonRepresentation(BsonType.ObjectId)]
@@ -24,14 +24,15 @@ namespace TelegramShedullerApp.Models
         [BsonElement("TaskText")]
         //[BsonRepresentation(BsonType.String)]
         [DataMember]
-        private string TaskText { get; set; }
+         string TaskText { get; set; }
 
         [BsonElement("TaskDate")]
         //[BsonRepresentation(BsonType.DateTime)]
         [DataMember]
         private DateTime TaskDate { get; set; }
+    
 
-        public Task CreateTask(long userId, string taskText, DateTime taskDate)
+        public UserTask CreateTask(long userId, string taskText, DateTime taskDate)
         {
             this.UserId = userId;
             this.TaskDate = taskDate;
@@ -40,17 +41,6 @@ namespace TelegramShedullerApp.Models
             return this;
         }
 
-        //TODO: Remove after test ends
-        public bool CheckOnNull()
-        {
-            bool t = false;
-
-            if (UserId == 0 && String.IsNullOrEmpty(TaskText))
-            {
-                t = true;
-            }
-
-            return t;
-        }
+        
     }
 }

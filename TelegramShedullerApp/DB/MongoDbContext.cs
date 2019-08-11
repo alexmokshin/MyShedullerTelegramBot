@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace TelegramShedullerApp.DB
 {
@@ -27,11 +28,11 @@ namespace TelegramShedullerApp.DB
             }
         }
 
-        public async Task InsertNewTask(TelegramShedullerApp.Models.Task myTask)
+        public async Task InsertNewTask(TelegramShedullerApp.Models.UserTask myUserTask)
         {
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
-            var p = myTask.ToBsonDocument();
+            var p = myUserTask.ToBsonDocument();
             Console.WriteLine("Time to boxing class {0} or {1}ticks",_stopWatch.ElapsedMilliseconds, _stopWatch.ElapsedTicks);
 
             //Console.WriteLine("{0} Try to get collection",DateTime.Now);
@@ -51,9 +52,19 @@ namespace TelegramShedullerApp.DB
             Console.WriteLine("Elapsed time to insert doc {0}",_stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<List<Models.Task>> GetTasksForUser(long userId)
+        public async Task<List<Models.UserTask>> GetTasksForUser(long userId)
         {
-            List<Models.Task> tasks = new List<Models.Task>();
+            List<Models.UserTask> tasks = new List<Models.UserTask>();
+
+            var collection = MongoDatabase.GetCollection<Models.UserTask>(MongoCollectionName);
+            var userFilter = new BsonDocument("$and", new BsonArray
+            {
+                new BsonDocument("UserId", userId),
+                new BsonDocument("TaskDate", new BsonDocument("$gte",DateTime.Now))
+            });
+            if (collection != null)
+                tasks = await collection.FindAsync(userFilter).Result.ToListAsync();
+
             return tasks;
         }
 
